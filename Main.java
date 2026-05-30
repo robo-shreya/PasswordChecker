@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +10,13 @@ public class Main {
         PasswordChecker passwordChecker = new PasswordChecker();
 
         passwordChecker.validate(password);
-        passwordChecker.getFailedRules();
+        List<String> violatedRulesList = passwordChecker.getFailedRules();
+
+        for (int i = 0; i < violatedRulesList.size(); i++) {
+            System.out.println(
+                violatedRulesList.get(i)
+            );            
+        }
 
         scanner.close();
     }

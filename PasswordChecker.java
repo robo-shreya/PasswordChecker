@@ -36,14 +36,14 @@ public class PasswordChecker {
 
     }
     
-    public void getFailedRules() {
+    public List<String> getFailedRules() {
+        
+        List<String> rulesViolated = new ArrayList<>();
+        
         for (int i = 0; i < failedTestValidatorList.size(); i++) {
-            System.out.println(failedTestValidatorList.get(i).description());
+            rulesViolated.add(failedTestValidatorList.get(i).description());
         }
-
-        if (failedTestValidatorList.isEmpty()) {
-            System.err.println("Password is good");
-        }
+        return rulesViolated;
     }
     
 }
