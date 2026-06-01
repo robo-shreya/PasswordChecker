@@ -1,25 +1,11 @@
-import java.util.List;
-import java.util.Scanner;
+import backend.PasswordBackendServer;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter password to be validated: ");
-        String password = scanner.nextLine();
+    public static void main(String[] args) throws IOException {
+        PasswordBackendServer server = new PasswordBackendServer(8080);
 
-        PasswordChecker passwordChecker = new PasswordChecker();
-
-        passwordChecker.validate(password);
-        List<String> violatedRulesList = passwordChecker.getFailedRules();
-
-        for (int i = 0; i < violatedRulesList.size(); i++) {
-            System.out.println(
-                violatedRulesList.get(i)
-            );            
-        }
-
-        scanner.close();
+        server.start();
+        System.out.println("Password checker backend running at http://localhost:8080");
     }
-
-
 }
