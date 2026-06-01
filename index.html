@@ -41,34 +41,77 @@
             font-size: 14px;
             line-height: 1.5;
         }
+
+        #valid-password {
+            margin: 12px 0 0;
+            padding-left: 20px;
+            color: #26dc51;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .button {
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        
     </style>
 </head>
 <body>
     <main>
         <label for="password">Password</label>
+
         <input id="password" type="password" placeholder="Enter a password">
+
+        <div>
+            <button type="button" id="check-password-button">Check password</button>
+            <button type="button" id="show-password-button">Show password</button>
+        </div>
+
         <ul id="violated-rules"></ul>
+        
+        <p id="valid-password"></p>
     </main>
 
     <script>
         const passwordInput = document.querySelector("#password");
         const violatedRules = document.querySelector("#violated-rules");
+        const validPassword = document.querySelector("#valid-password");
+        const checkPasswordButton = document.querySelector("#check-password-button");
+        const showPasswordButton = document.querySelector("#show-password-button");
         window.violatedRulesList = [];
 
-        passwordInput.addEventListener("input", async () => {
+        checkPasswordButton.addEventListener("click", async () => {
             const response = await fetch(
                 `http://localhost:8080/violated-rules?password=${encodeURIComponent(passwordInput.value)}`
             );
 
             window.violatedRulesList = await response.json();
             violatedRules.innerHTML = "";
+            validPassword.innerHTML = "";
 
             for (let i = 0; i < window.violatedRulesList.length; i++) {
                 const rule = document.createElement("li");
                 rule.textContent = window.violatedRulesList[i];
                 violatedRules.appendChild(rule);
             }
+
+            if(window.violatedRulesList.length < 1){
+                validPassword.textContent = "Password is valid";
+            }
+
         });
+
+        showPasswordButton.addEventListener("click", () => {
+                passwordInput.type = "text";
+            });
     </script>
 </body>
 </html>

@@ -8,6 +8,11 @@ import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import validators.PasswordDigitValidator;
+import validators.PasswordLengthValidator;
+import validators.PasswordLowerCaseValidator;
+import validators.PasswordSymbolValidator;
+import validators.PasswordUpperCaseValidator;
 
 public class PasswordBackendServer {
     private final HttpServer server;
@@ -35,7 +40,15 @@ public class PasswordBackendServer {
     }
 
     private String getViolatedRulesJson(String password) {
-        PasswordChecker passwordChecker = new PasswordChecker();
+        PasswordChecker passwordChecker = new PasswordChecker(
+            List.of(
+                new PasswordDigitValidator(),
+                new PasswordLengthValidator(),
+                new PasswordLowerCaseValidator(),
+                new PasswordSymbolValidator(),
+                new PasswordUpperCaseValidator()
+            )
+        );
 
         passwordChecker.validate(password);
         List<String> violatedRulesList = passwordChecker.getFailedRules();
