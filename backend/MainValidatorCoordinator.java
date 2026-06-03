@@ -1,20 +1,20 @@
 package backend;
 
+import interfaces.ValidatorInterface;
 import java.util.ArrayList;
 import java.util.List;
-import validators.PasswordValidatorInterface;
 
-public class PasswordChecker {
+public class MainValidatorCoordinator {
 
-    public PasswordChecker(
-        List<PasswordValidatorInterface> validatorList
+    public MainValidatorCoordinator(
+        List<ValidatorInterface> validatorList
     ) {
         this.validatorList = validatorList;
     }
 
-    List<PasswordValidatorInterface> validatorList = new ArrayList<>();
+    List<ValidatorInterface> validatorList = new ArrayList<>();
 
-    List<PasswordValidatorInterface> failedTestValidatorList = new ArrayList<>();
+    List<ValidatorInterface> failedTestValidatorList = new ArrayList<>();
 
     public void validate(
         String password
@@ -22,7 +22,7 @@ public class PasswordChecker {
         failedTestValidatorList.clear();
 
         for (int i = 0; i < validatorList.size(); i++) {
-            PasswordValidatorInterface validator = validatorList.get(i);
+            ValidatorInterface validator = validatorList.get(i);
             if (!validator.validate(password)) {
                 failedTestValidatorList.add(validator);
             }

@@ -1,6 +1,8 @@
-package validators;
+package passwordvalidators;
 
-public class PasswordLengthValidator implements PasswordValidatorInterface{
+import interfaces.ValidatorInterface;
+
+public class LengthValidator implements ValidatorInterface{
 
     @Override
     public boolean validate(String password) {

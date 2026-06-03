@@ -34,7 +34,8 @@
             font-size: 16px;
         }
 
-        #violated-rules {
+        #violated-rules-password,
+        #violated-rules-email {
             margin: 12px 0 0;
             padding-left: 20px;
             color: #dc2626;
@@ -42,6 +43,7 @@
             line-height: 1.5;
         }
 
+        #valid-email,
         #valid-password {
             margin: 12px 0 0;
             padding-left: 20px;
@@ -66,31 +68,65 @@
 </head>
 <body>
     <main>
+
+        <label for="email">Email</label>
+
+        <input id="email" type="text" placeholder="Enter an email">
+
+        <ul id="violated-rules-email"></ul>
+
+        <p id="valid-email"></p>
+
         <label for="password">Password</label>
 
         <input id="password" type="password" placeholder="Enter a password">
 
-        <div>
-            <button type="button" id="check-password-button">Check password</button>
-            <button type="button" id="show-password-button">Show password</button>
-        </div>
+        <button type="button" id="show-password-button">Show password</button>
 
-        <ul id="violated-rules"></ul>
+        <ul id="violated-rules-password"></ul>
         
         <p id="valid-password"></p>
     </main>
 
     <script>
+        const emailInput = document.querySelector("#email");
+        const violatedRulesEmail = document.querySelector("#violated-rules-email");
+        const validEmail = document.querySelector("#valid-email");
+        window.violatedEmailRulesList = [];
+
+        emailInput.addEventListener("input", async() => {
+            const response = await fetch(
+                `http://localhost:8080/violated-email-rules?email=${encodeURIComponent(emailInput.value)}`
+            );
+
+            window.violatedEmailRulesList = await response.json();
+            violatedRulesEmail.innerHTML = "";
+            validEmail.innerHTML = "";
+
+            for(let i = 0; i < window.violatedEmailRulesList.length; i++){
+                const rule = document.createElement("li");
+                rule.textContent = window.violatedEmailRulesList[i];
+                violatedRulesEmail.appendChild(rule);
+            }
+
+            if(window.violatedEmailRulesList.length < 1){
+                validEmail.textContent = "Email is valid";
+            }
+        });
+
+        
+    </script>
+
+    <script>
         const passwordInput = document.querySelector("#password");
-        const violatedRules = document.querySelector("#violated-rules");
+        const violatedRules = document.querySelector("#violated-rules-password");
         const validPassword = document.querySelector("#valid-password");
-        const checkPasswordButton = document.querySelector("#check-password-button");
         const showPasswordButton = document.querySelector("#show-password-button");
         window.violatedRulesList = [];
 
-        checkPasswordButton.addEventListener("click", async () => {
+        passwordInput.addEventListener("input", async () => {
             const response = await fetch(
-                `http://localhost:8080/violated-rules?password=${encodeURIComponent(passwordInput.value)}`
+                `http://localhost:8080/violated-password-rules?password=${encodeURIComponent(passwordInput.value)}`
             );
 
             window.violatedRulesList = await response.json();

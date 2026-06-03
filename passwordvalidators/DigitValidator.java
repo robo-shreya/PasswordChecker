@@ -1,8 +1,10 @@
-package validators;
+package passwordvalidators;
 
-public class PasswordDigitValidator implements PasswordValidatorInterface {
+import interfaces.ValidatorInterface;
 
-    public PasswordDigitValidator() {
+public class DigitValidator implements ValidatorInterface {
+
+    public DigitValidator() {
     }
 
     @Override

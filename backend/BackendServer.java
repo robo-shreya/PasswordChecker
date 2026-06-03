@@ -2,57 +2,97 @@ package backend;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import emailvalidators.DomainDotValidator;
+import emailvalidators.HasDomainPartValidator;
+import emailvalidators.HasLocalPartValidator;
+import emailvalidators.NoSpacesValidator;
+import emailvalidators.SingleAtValidator;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import validators.PasswordDigitValidator;
-import validators.PasswordLengthValidator;
-import validators.PasswordLowerCaseValidator;
-import validators.PasswordSymbolValidator;
-import validators.PasswordUpperCaseValidator;
+import passwordvalidators.*;
 
-public class PasswordBackendServer {
+public class BackendServer {
     private final HttpServer server;
 
-    public PasswordBackendServer(int port) throws IOException {
+    public BackendServer(int port) throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
 
-        server.createContext("/violated-rules", exchange -> {
+        server.createContext("/violated-email-rules", exchange -> {
+            if (!"GET".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(405, -1);
+                return;
+            }
+
+            String email = getQueryParam(exchange, "email");
+            String response = getViolatedEmailRulesJson(email);
+
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+
+            sendResponse(exchange, response);
+        });
+
+        server.createContext("/violated-password-rules", exchange -> {
             if (!"GET".equals(exchange.getRequestMethod())) {
                 exchange.sendResponseHeaders(405, -1);
                 return;
             }
 
             String password = getQueryParam(exchange, "password");
-            String response = getViolatedRulesJson(password);
+            String response = getViolatedPasswordRulesJson(password);
 
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             sendResponse(exchange, response);
         });
+
     }
 
     public void start() {
         server.start();
     }
 
-    private String getViolatedRulesJson(String password) {
-        PasswordChecker passwordChecker = new PasswordChecker(
+    private String getViolatedEmailRulesJson(String email) {
+
+        MainValidatorCoordinator validatorCoordinator = new MainValidatorCoordinator(
             List.of(
-                new PasswordDigitValidator(),
-                new PasswordLengthValidator(),
-                new PasswordLowerCaseValidator(),
-                new PasswordSymbolValidator(),
-                new PasswordUpperCaseValidator()
+                new SingleAtValidator(),
+                new DomainDotValidator(),
+                new HasLocalPartValidator(),
+                new HasDomainPartValidator(),
+                new NoSpacesValidator()
             )
         );
 
-        passwordChecker.validate(password);
-        List<String> violatedRulesList = passwordChecker.getFailedRules();
+        validatorCoordinator.validate(email);
 
+        List<String> violatedEmailRulesList = validatorCoordinator.getFailedRules();
+
+        return getJson(violatedEmailRulesList);
+    }
+
+    private String getViolatedPasswordRulesJson(String password) {
+        MainValidatorCoordinator validatorCoordinator = new MainValidatorCoordinator(
+            List.of(
+                new DigitValidator(),
+                new LengthValidator(),
+                new LowerCaseValidator(),
+                new SymbolValidator(),
+                new UpperCaseValidator()
+            )
+        );
+
+        validatorCoordinator.validate(password);
+        List<String> violatedPasswordRulesList = validatorCoordinator.getFailedRules();
+
+        return getJson(violatedPasswordRulesList);
+    }
+
+    private String getJson(List<String> violatedRulesList) {
         StringBuilder json = new StringBuilder("[");
 
         for (int i = 0; i < violatedRulesList.size(); i++) {

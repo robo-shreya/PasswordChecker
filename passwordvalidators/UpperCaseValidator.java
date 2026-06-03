@@ -1,11 +1,13 @@
-package validators;
+package passwordvalidators;
 
-public class PasswordLowerCaseValidator implements PasswordValidatorInterface {
+import interfaces.ValidatorInterface;
+
+public class UpperCaseValidator implements ValidatorInterface {
 
     @Override
     public boolean validate(String password) {
         for (int i = 0; i < password.length(); i++) {
-            if (Character.isLowerCase(password.charAt(i))) {
+            if (Character.isUpperCase(password.charAt(i))) {
                 return true;
             }
         }
@@ -14,7 +16,7 @@ public class PasswordLowerCaseValidator implements PasswordValidatorInterface {
 
     @Override
     public String description() {
-        return "must contain a lowercase letter";
+        return "must contain an uppercase letter";
     }
     
 }

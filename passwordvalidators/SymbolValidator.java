@@ -1,6 +1,8 @@
-package validators;
+package passwordvalidators;
 
-public class PasswordSymbolValidator implements PasswordValidatorInterface {
+import interfaces.ValidatorInterface;
+
+public class SymbolValidator implements ValidatorInterface {
 
     @Override
     public boolean validate(String password) {
